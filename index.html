@@ -1,0 +1,553 @@
+<html>
+	<head>
+		<title>Questionnaire</title>
+
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+		<style>
+			#content {
+				border: 1px solid #eee;
+				border-radius: 4px;
+				padding: 10px 20px;
+			}
+
+			#content_form_name {
+				cursor: pointer;
+			}
+
+			.content-hover {
+				border: 1px dashed #3a87ad !important;
+				color: #3a87ad;
+				background: #d9edf7;
+				opacity: 0.5;
+			}
+
+			.content-hover legend {
+				color: #3a87ad;
+				border-color: -moz-use-text-color -moz-use-text-color #3a87ad;
+			}
+
+			.content-hover .element {
+				border: 1px solid #d9edf7;
+			}
+
+			input[type=text] {
+				height: auto;
+			}
+
+			.component {
+				cursor: move;
+				padding: 10px;
+				border: 1px solid #fff;
+			}
+
+			.component:hover {
+				background: #fafafa !important;
+				border: 1px solid #eee;
+			}
+
+			.component-drag {
+				border: 1px solid #eee;
+				border-radius: 4px;
+				padding: 10px;
+				background: #FFF;
+			}
+
+			.element {
+				cursor: move;
+				padding: 10px;
+				border: 1px solid #fff;
+			}
+
+			.element:hover {
+				background: #fafafa;
+				border: 1px solid #eee;
+			}
+
+			.element-placeholder {
+				border: 1px dashed #3a87ad;
+				color: #3a87ad;
+				background: #d9edf7;
+				min-height: 50px;
+				opacity: 0.5;
+			}
+
+			.options {
+				display: none;
+			}
+		</style>
+
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+
+		<script>
+			$(function() {
+				// element options object
+				var options = {
+						// selected element reference
+						el: null,
+
+						// set current element
+						setElement: function(el) {
+							this.el = el;
+						},
+
+						// get current element
+						getElement: function() {
+							return this.el;
+						},
+
+						// clean value to be used in name (remove spaces, non-alphanumeric characters and make lowercase)
+						cleanName: function(name) {
+							return name
+									.trim()
+									.replace(/ /g, '_')
+									// .replace(/[^A-Za-z0-9]/, '')
+									.toLowerCase();
+						},
+
+						// form title options
+						title: {
+							prefix: '.options_title_',
+
+							get: function() {
+								var el = options.getElement(),
+									legend = el.find('legend');
+
+								$(this.prefix+'name')
+								.val(legend.text())
+								.focus();
+							},
+
+							set: function() {
+								var el = options.getElement(),
+									legend = el.find('legend');
+
+								legend.text($(this.prefix+'name').val());
+							}
+						},
+
+						// text input options
+						text: {
+							prefix: '.options_text_',
+
+							get: function() {
+								var el = options.getElement();
+
+								$(this.prefix+'name').val('');
+								$(this.prefix+'label').val(el.find('label').text());
+								$(this.prefix+'placeholder').val(el.find('input[type=text]').attr('placeholder'));
+							},
+
+							set: function() {
+								var el = options.getElement(),
+									input = el.find('input[type=text]'),
+									label = el.find('label');
+
+								input.attr('name', options.cleanName($(this.prefix+'name').val()));
+								label.text($(this.prefix+'label').val());
+								input.attr('placeholder', $(this.prefix+'placeholder').val());
+							}
+						},
+
+						// textarea options
+						textarea: {
+							prefix: '.options_textarea_',
+
+							get: function() {
+								var el = options.getElement();
+
+								$(this.prefix+'name').val('');
+								$(this.prefix+'label').val(el.find('label').text());
+								$(this.prefix+'placeholder').val(el.find('textarea').attr('placeholder'));
+							},
+
+							set: function() {
+								var el = options.getElement(),
+									textarea = el.find('textarea'),
+									label = el.find('label');
+
+								textarea.attr('name', options.cleanName($(this.prefix+'name').val()));
+								label.text($(this.prefix+'label').val());
+								textarea.attr('placeholder', $(this.prefix+'placeholder').val());
+							}
+						},
+
+						// basic select box options
+						select_basic: {
+							prefix: '.options_select_basic_',
+
+							split: '=',
+
+							get: function() {
+								var el = options.getElement(),
+									list_options = '',
+									split = this.split;
+
+									console.log(this.split);
+
+								el.find('select > option').each(function(key, val) {
+									var val_and_split = options.cleanName($(val).text()) == $(val).val() ? '' : ($(val).val() + split);
+									list_options += val_and_split + $(val).text()+"\n";
+								});
+
+								$(this.prefix+'name').val('');
+								$(this.prefix+'label').val(el.find('label').text());
+								$(this.prefix+'options').val(list_options);
+							},
+
+							set: function() {
+								var el = options.getElement(),
+									select = el.find('select'),
+									label = el.find('label'),
+
+									options_blob = $(this.prefix+'options').val(),
+									select_options = options_blob.replace(/\r\n/, "\n").split("\n"),
+									list_options = '';
+
+								$.each(select_options, function(key, val) {
+									if(val.indexOf(this.split) !== -1) {
+										var opt = val.split(this.split);
+
+										list_options += '<option value="'+options.cleanName(opt[0])+'">'+opt[1]+'</option>';
+									} else {
+										list_options += '<option value="'+options.cleanName(val)+'">'+val+'</option>';
+									}
+								});
+
+								select.attr('name', options.cleanName($(this.prefix+'name').val()));
+								label.text($(this.prefix+'label').val());
+								select.html(list_options);
+							}
+						},
+
+						// multi select box options
+						select_multiple: {
+							prefix: '.options_select_multiple_',
+
+							get: function() {
+								var el = options.getElement();
+							},
+
+							set: function() {
+								var el = options.getElement();
+							}
+						},
+
+						checkbox: {
+							prefix: '.options_checkbox_',
+
+							get: function() {
+								var el = options.getElement();
+							},
+
+							set: function() {
+								var el = options.getElement();
+							}
+						},
+
+						radio: {
+							prefix: '.options_radio_',
+
+							get: function() {
+								var el = options.getElement();
+							},
+
+							set: function() {
+								var el = options.getElement();
+							}
+						},
+					};
+
+				$(".component")
+				.draggable({
+					helper: function(e) {
+						return $(this).clone().addClass('component-drag');
+					}
+				})
+				.click(function(e) {
+					addComponent($(this));
+				});
+
+				$(document).on('click', '.element > .close', function(e) {
+					e.stopPropagation();
+
+					$(this).parent().fadeOut('normal', function() {
+						$(this).remove();
+					});
+				});
+
+				$(document).on('click', '.element', function() {
+					var $modal = $("#options_modal"),
+						content = $modal.find('.modal-body'),
+						type = $(this).data('type')
+						option_box = $(".options-"+type);
+
+					$modal.data('type', type);
+
+					content.html(option_box.html());
+
+					options.setElement($(this));
+					options[type].get();
+
+					$modal.modal('show');
+				});
+
+				$("#save_options").click(function() {
+					var $modal = $("#options_modal"),
+						content = $modal.find('.modal-body'),
+						type = $modal.data('type');
+
+					options[type].set();
+
+					$modal.modal('hide');
+				});
+
+				$(document).on('click', '.element > input, .element > textarea, .element > label', function(e) {
+					e.preventDefault();
+				});
+
+				$(".component > input, .component > textarea, .component > label").click(function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+				});
+
+				$("#content")
+				.droppable({
+					accept: '.component',
+					hoverClass: 'content-hover',
+					drop: function(e, ui) {
+						addComponent(ui.draggable);
+					}
+				})
+				.sortable({
+					placeholder: "element-placeholder",
+					start: function(e, ui) {
+						ui.item.popover('hide');
+					}
+				})
+				.disableSelection();
+
+				$("#content_form_name").click(function() {
+					var $modal = $("#options_modal"),
+						content = $modal.find('.modal-body'),
+						type = 'title',
+						option_box = $(".options-title");
+
+					$modal.data('type', 'title');
+
+					content.html(option_box.html());
+
+					options.setElement($(this));
+					options[type].get();
+
+					$modal.modal('show');
+				});
+			});
+
+			function addComponent(component) {
+				component
+				.clone()
+				.removeClass('component')
+				.addClass('element')
+				.prepend('<div class="close">&times;</div>')
+				.appendTo("#content");
+
+				$("#options_modal").modal('hide');
+			}
+		</script>
+	</head>
+	<body>
+		<div class="row-fluid">
+			<div class="span10 offset1">
+				<div class="row-fluid">
+					<div class="span6">
+						<h1>Questionnaire</h1>
+						<hr>
+						<form id="content" class="form-horizontal">
+							<fieldset id="content_form_name">
+								<legend>Form Name</legend>
+							</fieldset>
+						</form>
+					</div>
+
+					<div class="span6">
+						<h1>Components</h1>
+						<hr>
+						<div id="components-container" class="form-horizontal">
+							<div class="control-group component" data-type="text">
+								<label class="control-label" for="text_input">Text Input</label>
+								<div class="controls">
+									<input type="text" name="" id="text_input" placeholder="placeholder">
+								</div>
+							</div>
+
+							<div class="control-group component" data-type="textarea">
+								<label class="control-label" for="textarea">Textarea</label>
+								<div class="controls">
+									<textarea name="" id="textarea" placeholder="placeholder"></textarea>
+								</div>
+							</div>
+
+							<div class="control-group component" data-type="select_basic">
+								<label class="control-label" for="select_basic">Select - Basic</label>
+								<div class="controls">
+									<select name="" id="select_basic">
+										<option value="1">Option 1</option>
+										<option value="2">Option 2</option>
+										<option value="3">Option 3</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="control-group component" data-type="select_multiple">
+								<label class="control-label" for="select_multiple">Select - Multiple</label>
+								<div class="controls">
+									<select name="" id="select_multiple" multiple="multiple" size="3">
+										<option value="1">Option 1</option>
+										<option value="2">Option 2</option>
+										<option value="3">Option 3</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="control-group component" data-type="checkbox">
+								<label class="control-label">Checkboxes</label>
+								<div class="controls">
+									<label class="checkbox" for="checkbox_1">
+										<input type="checkbox" name="" id="checkbox_1">
+										Option 1
+									</label>
+									<label class="checkbox" for="checkbox_2">
+										<input type="checkbox" name="" id="checkbox_2">
+										Option 2
+									</label>
+									<label class="checkbox" for="checkbox_3">
+										<input type="checkbox" name="" id="checkbox_3">
+										Option 3
+									</label>
+								</div>
+							</div>
+
+							<div class="control-group component" data-type="radio">
+								<label class="control-label">Radio Buttons</label>
+								<div class="controls">
+									<label class="radio" for="radio_1">
+										<input type="radio" name="" id="radio_1">
+										Option 1
+									</label>
+									<label class="radio" for="radio_2">
+										<input type="radio" name="" id="radio_2">
+										Option 2
+									</label>
+									<label class="radio" for="radio_3">
+										<input type="radio" name="" id="radio_3">
+										Option 3
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="options_modal">
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">&times;</a>
+				<h3>Options</h3>
+			</div>
+
+			<div class="modal-body form-horizontal"></div>
+
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-primary" id="save_options">Save changes</a>
+				<a href="javascript:;" class="btn" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+
+		<!-- Title Options -->
+		<div class="options options-title form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Form Name</label>
+				<div class="controls">
+					<input type="text" class="options_title_name" placeholder="Form Name">
+				</div>
+			</div>
+		</div>
+
+		<!-- Text Options -->
+		<div class="options options-text form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input type="text" class="options_text_name" placeholder="Name">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Label</label>
+				<div class="controls">
+					<input type="text" class="options_text_label" placeholder="Label">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Placeholder</label>
+				<div class="controls">
+					<input type="text" class="options_text_placeholder" placeholder="Placeholder">
+				</div>
+			</div>
+		</div>
+
+		<!-- Textarea Options -->
+		<div class="options options-textarea form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input type="text" class="options_textarea_name" placeholder="Name">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Label</label>
+				<div class="controls">
+					<input type="text" class="options_textarea_label" placeholder="Label">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Placeholder</label>
+				<div class="controls">
+					<input type="text" class="options_textarea_placeholder" placeholder="Placeholder">
+				</div>
+			</div>
+		</div>
+
+		<!-- Select - Basic Options -->
+		<div class="options options-select_basic form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input type="text" class="options_select_basic_name" placeholder="Name">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Label</label>
+				<div class="controls">
+					<input type="text" class="options_select_basic_label" placeholder="Label">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Options</label>
+				<div class="controls">
+					<textarea class="options_select_basic_options" placeholder="Options"></textarea>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
