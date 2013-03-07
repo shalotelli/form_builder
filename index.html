@@ -374,7 +374,7 @@
 									}
 								});
 
-								select.attr('name', options.cleanName($(this.prefix+'name').val()));
+								select.attr('name', options.cleanName($(this.prefix+'name').val())+'[]');
 								label.text($(this.prefix+'label').val());
 								select.html(list_options);
 							}
