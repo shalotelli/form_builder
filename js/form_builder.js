@@ -322,10 +322,12 @@ $(function() {
 			}
 		},
 
+		// checkbox options
 		checkbox: {
 			// options class prefix
 			prefix: '.options_checkbox_',
 
+			// get checkbox options
 			get: function() {
 				var el = form_builder.getElement(),
 					list_options = '',
@@ -346,6 +348,7 @@ $(function() {
 				$(this.prefix+'options').val(list_options);
 			},
 
+			// set checkbox options
 			set: function() {
 				var el = form_builder.getElement(),
 					label = el.find('label:first'),
@@ -394,10 +397,12 @@ $(function() {
 			}
 		},
 
+		// radio buttons options
 		radio: {
 			// options class prefix
 			prefix: '.options_radio_',
 
+			// get radio buttons options
 			get: function() {
 				var el = form_builder.getElement(),
 					list_options = '',
@@ -418,6 +423,7 @@ $(function() {
 				$(this.prefix+'options').val(list_options);
 			},
 
+			// set radio button options
 			set: function() {
 				var el = form_builder.getElement(),
 					label = el.find('label:first'),
@@ -466,31 +472,58 @@ $(function() {
 			}
 		},
 
-		submit: {
-			// options class prefix
-			prefix: '.options_submit_',
+		// static text options
+		static_text: {
+			prefix: '.options_static_text_',
 
 			get: function() {
 				var el = form_builder.getElement();
 
+				$(this.prefix+'label').val(el.find('label').text());
+				$(this.prefix+'text').val(el.find('.controls').html().trim());
+			},
+
+			set: function() {
+				var el = form_builder.getElement();
+
+				el.find('label').text($(this.prefix+'label').val());
+				el.find('.controls').html($(this.prefix+'text').val());
+			}
+		},
+
+		// submit button options
+		submit: {
+			// options class prefix
+			prefix: '.options_submit_',
+
+			// get submit button options
+			get: function() {
+				var el = form_builder.getElement();
+
+				// submit button text
 				$(this.prefix+'label').val(el.find('button[type=submit]').text());
 
+				// get cancel button visibility
 				if(el.find('button[type=button]').hasClass('hide')) {
 					$(this.prefix+'show_cancel').val(0);
 				} else {
 					$(this.prefix+'show_cancel').val(1);
 				}
 
+				// get form_builder variables for method & action
 				$(this.prefix+'method').val(form_builder.method);
 				$(this.prefix+'action').val(form_builder.action);
 			},
 
+			// set submit button options
 			set: function() {
 				var el = form_builder.getElement(),
 					cancel = el.find('button[type=button]');
 
 				el.find('button[type=submit]').text($(this.prefix+'label').val());
 
+				// hide or show cancel button
+				// TODO: Remove & add cancel button instead of just making it invisible
 				if($(this.prefix+'show_cancel').val()==1) {
 					if(cancel.hasClass('hide')) {
 						cancel.removeClass('hide');
@@ -501,12 +534,15 @@ $(function() {
 					}
 				}
 
+				// set form_builder variables for method & action
 				form_builder.method = $(this.prefix+'method').val();
 				form_builder.action = $(this.prefix+'action').val();
 			}
 		}
 	};
 
+	// components are useable form elements that can be dragged or clicked
+	// to add them to the form
 	$(".component")
 	.draggable({
 		helper: function(e) {
@@ -517,6 +553,7 @@ $(function() {
 		form_builder.addComponent($(this));
 	});
 
+	// remove element when clicking close button
 	$(document).on('click', '.element > .close', function(e) {
 		e.stopPropagation();
 
@@ -525,41 +562,60 @@ $(function() {
 		});
 	});
 
+	// elements are components that have been added to the form
+	// clicking elements brings up customizable options in a
+	// modal window
 	$(document).on('click', '.element', function() {
 		var $modal = $("#options_modal"),
 			content = $modal.find('.modal-body'),
-			type = $(this).data('type')
+			type = $(this).data('type'),
 			option_box = $(".options-"+type);
 
+		// set options modal type
 		$modal.data('type', type);
 
+		// load relevant options
 		content.html(option_box.html());
 
+		// set selected element to clicked element
+		// this removes the need to generate unique
+		// id's for every created element at they are
+		// passed instead of referenced
 		form_builder.setElement($(this));
+
+		// add current options into fields and do any
+		// necessary preprocessing
 		form_builder[type].get();
 
+		// show options modal
 		$modal.modal('show');
 	});
 
+	// options modal save button
 	$("#save_options").click(function() {
 		var $modal = $("#options_modal"),
 			content = $modal.find('.modal-body'),
 			type = $modal.data('type');
 
+		// call corresponding save method to process entered variables
 		form_builder[type].set();
 
 		$modal.modal('hide');
 	});
 
+	//prevent default behaviour of element form items
 	$(document).on('click', '.element > input, .element > textarea, .element > label', function(e) {
 		e.preventDefault();
 	});
 
+	// random bug makes options modal load when certain components are clicked. prevent this!
 	$(".component > input, .component > textarea, .component > label, .checkbox, .radio").click(function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 	});
 
+	// the form editor is a droppable area that accepts components,
+	// converts them to elements and makes them sortable
 	$("#content")
 	.droppable({
 		accept: '.component',
@@ -576,19 +632,28 @@ $(function() {
 	})
 	.disableSelection();
 
+	// the form can also be given a title by clicking the legend at the top
+	// as this is not a component, do the necessary leg work and show the options
+	// modal accordingly
 	$("#content_form_name").click(function() {
 		var $modal = $("#options_modal"),
 			content = $modal.find('.modal-body'),
 			type = 'title',
 			option_box = $(".options-title");
 
+		// set modal type to title
 		$modal.data('type', 'title');
 
+		// create options box
 		content.html(option_box.html());
 
+		// set form_builder element to this element
 		form_builder.setElement($(this));
+
+		// do any options pre processing
 		form_builder[type].get();
 
+		// show modal
 		$modal.modal('show');
 	});
 
@@ -603,9 +668,9 @@ $(function() {
 	// adding a refresh after 1ms seems to sort out an issue where the source code
 	// box does not display until user starts typing something
 	$("a[href=#source-tab]").click(function() {
-		setTimeout(function() { 
+		setTimeout(function() {
 			form_builder.updateSource();
-			source.refresh(); 
+			source.refresh();
 		}, 1);
 	});
 });

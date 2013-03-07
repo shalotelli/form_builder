@@ -126,6 +126,13 @@
 								</div>
 							</div>
 
+							<div class="control-group component" data-type="static_text">
+								<label class="control-label">Static Text</label>
+								<div class="controls">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+								</div>
+							</div>
+
 							<div class="form-actions component" data-type="submit">
 								<button type="submit" class="btn btn-primary">Save changes</button>
 								<button type="button" class="btn" onclick="javascript:window.history.back();">Cancel</button>
@@ -228,6 +235,10 @@
 				<label class="control-label">Options</label>
 				<div class="controls">
 					<textarea class="options_select_basic_options" placeholder="Options"></textarea>
+					<span class="help-block">
+						Enter each option on a new line. If you want the value to be different to the displayed 
+						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
+					</span>
 				</div>
 			</div>
 		</div>
@@ -252,6 +263,10 @@
 				<label class="control-label">Options</label>
 				<div class="controls">
 					<textarea class="options_select_multiple_options" placeholder="Options"></textarea>
+					<span class="help-block">
+						Enter each option on a new line. If you want the value to be different to the displayed 
+						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
+					</span>
 				</div>
 			</div>
 		</div>
@@ -276,6 +291,10 @@
 				<label class="control-label">Options</label>
 				<div class="controls">
 					<textarea class="options_checkbox_options" placeholder="Options"></textarea>
+					<span class="help-block">
+						Enter each option on a new line. If you want the value to be different to the displayed 
+						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
+					</span>
 				</div>
 			</div>
 		</div>
@@ -300,6 +319,30 @@
 				<label class="control-label">Options</label>
 				<div class="controls">
 					<textarea class="options_radio_options" placeholder="Options"></textarea>
+					<span class="help-block">
+						Enter each option on a new line. If you want the value to be different to the displayed 
+						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Static Text Options -->
+		<div class="options options-static_text form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Label</label>
+				<div class="controls">
+					<input type="text" class="options_static_text_label" placeholder="Label">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Text</label>
+				<div class="controls">
+					<textarea class="options_static_text_text" style="width:100%;" rows="15" placeholder="Text"></textarea>
+					<span class="help-block">
+						Enter text or valid HTML markup.
+					</span>
 				</div>
 			</div>
 		</div>
