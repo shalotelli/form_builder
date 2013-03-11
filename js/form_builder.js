@@ -158,7 +158,7 @@ $(function() {
 				var el = form_builder.getElement(),
 					input = el.find('input[type=text]'),
 					label = el.find('label'),
-					name = options.cleanName($(this.prefix+'name').val());
+					name = form_builder.cleanName($(this.prefix+'name').val());
 
 				input.attr('name', name);
 
