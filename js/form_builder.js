@@ -87,7 +87,7 @@ $(function() {
 		},
 
 		updateSource: function() {
-			var content =	"<form method=\""+this.method+"\" " +
+			/*var content =	"<form method=\""+this.method+"\" " +
 							"action=\""+this.action+"\" " +
 							"class=\"form-horizontal\">\n" +
 							$("#content").html() +
@@ -98,7 +98,23 @@ $(function() {
 			source.autoFormatRange(
 				{ line: 0, ch: 0 },
 				{ line: source.lastLine()+1, ch: 0 }
-			);
+			);*/
+		},
+
+		toTransform: function(obj) {
+			var json;
+
+			if(obj.length>1) {
+				json = [];
+
+				for(var i=0;i<obj.length;i++) {
+					json[json.length++] = this.objToTransform(obj[i]);
+				}
+			} else {
+				json = this.objToTransform(obj);
+			}
+
+			return json;
 		},
 
 		addComponent: function(component) {
@@ -112,7 +128,7 @@ $(function() {
 
 			$("#options_modal").modal('hide');
 
-			this.updateSource();
+			// this.updateSource();
 		},
 
 		// form title options
@@ -658,11 +674,11 @@ $(function() {
 	});
 
 	// create codemirror instance & assign to global var source
-	source = CodeMirror.fromTextArea(document.getElementById("source"), {
+	/*source = CodeMirror.fromTextArea(document.getElementById("source"), {
 		lineNumbers: true,
 		tabMode: 'indent',
 		mode: { name: 'htmlmixed' }
-	});
+	});*/
 
 	// hack to sort random bug with codemirror & bootstrap tabs not playing nicely.
 	// adding a refresh after 1ms seems to sort out an issue where the source code
@@ -670,7 +686,7 @@ $(function() {
 	$("a[href=#source-tab]").click(function() {
 		setTimeout(function() {
 			form_builder.updateSource();
-			source.refresh();
+			// source.refresh();
 		}, 1);
 	});
 });
