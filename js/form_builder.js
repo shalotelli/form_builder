@@ -102,13 +102,20 @@ $(function() {
 			var json = [];
 
 			if(obj.length>1) {
+				// if(obj[0].nodeName.toLowerCase()=='select') {
+
+				// }
 				for(var i=0;i<obj.length;i++) {
+					if(Array.isArray(obj[i])) {
+						console.log(obj[i].nodeName.toLowerCase());
+					} else {
+						console.log(obj[i].nodeName.toLowerCase()+' is not an array');
+					}
+
 					json.push(this.objToTransform(obj[i]));
 				}
 			} else {
 				json = this.objToTransform(obj);
-
-				console.log(json);
 			}
 
 			return json;
@@ -131,8 +138,11 @@ $(function() {
 				json['html'] = $(obj).text().trim();
 			}
 
-
 			for(var c=0;c<children.length;c++) {
+				if(children[c].nodeName.toLowerCase()=='select') {
+					this.objToTransform(children[c]);
+				}
+
 				json['children'].push(this.toTransform(children[c]));
 			}
 
