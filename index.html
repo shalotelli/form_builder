@@ -20,24 +20,70 @@
 			$(function() {
 				$("#convert").on('click', function(e) {
 					var source = JSON.parse($("#source").val()),
-						source_type = $.type(source),
 						html = '';
 
-					if(source_type=='array') {
-						//
+					if(Array.isArray(source)) {
+						for(var i=0;i<source.length;i++) {
+							console.log(objToHTML(source[i]));
+						}
 					} else {
-						console.log(source);
-						html += '<'+source.tag+' ';
-
-						/*$.each(source.attr, function(key, val) {
-							html += key+'="'+val+'" ';
-						});*/
-
-						html += ">\n";
-
-						console.log(html);
+						console.log(objToHTML(source));
 					}
 				});
+
+				function objToHTML(obj) {
+					var html = '<'+obj.tag+' ',
+						children = '';
+
+					if(obj.hasOwnProperty('class')) {
+						if(obj.class=='close') return '';
+					}
+
+					for(var key in obj) {
+						switch(key) {
+							case 'tag':
+							case 'html':
+								// do nothing
+							break;
+
+							case 'children':
+								if(Array.isArray(obj.children)) {
+									for(var i=0;i<obj.children.length;i++) {
+										children += objToHTML(obj.children[i]);
+									}
+								} else {
+									children += objToHTML(obj.children);
+								}
+							break;
+
+							case 'class':
+								var val = obj[key].replace(/ ui-draggable| element/gi, '');
+								html += key+'="'+val+'" ';
+							break;
+
+							default:
+								if(key.indexOf('data-')==-1) {
+									html += key+'="'+obj[key]+'" ';
+								// }
+						}
+					}
+
+					html  = html.replace(/\s\s*$/gm, '')+">";
+
+					if(obj.hasOwnProperty('html')) {
+						html += obj.html;
+					}
+
+					if(obj.hasOwnProperty('children')) {
+						html += "\n"+children;
+					}
+
+					html += "</"+obj.tag+">\n";
+
+					return html;
+
+					// console.log(html);
+				}
 			});
 		</script>
 	</head>

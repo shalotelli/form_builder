@@ -107,6 +107,8 @@ $(function() {
 				}
 			} else {
 				json = this.objToTransform(obj);
+
+				console.log(json);
 			}
 
 			return json;
@@ -126,11 +128,12 @@ $(function() {
 			if(children.length>0) {
 				json['children'] = [];
 			} else {
-				json['html'] = $(obj).text();
+				json['html'] = $(obj).text().trim();
 			}
 
+
 			for(var c=0;c<children.length;c++) {
-				json['children'][json['children'].length++] = this.toTransform(children[c]);
+				json['children'].push(this.toTransform(children[c]));
 			}
 
 			return json;
@@ -138,13 +141,13 @@ $(function() {
 
 		formatJSON: function(data, indent) {
 			var indent_style = "  ",
-				data_type = $.type(data),
 				html = "",
+				is_array = Array.isArray(data),
 				count = 0;
 
 			indent = indent || '';
 
-			if(data_type=='array') {
+			if(is_array) {
 				if(data.length===0) {
 					return '[]';
 				}
@@ -170,7 +173,7 @@ $(function() {
 					html += ',';
 				}
 
-				if(data_type=='array') {
+				if(is_array) {
 					html += "\n" + indent + indent_style;
 				} else {
 					html += '"' + key + '"' + ':';
@@ -202,7 +205,7 @@ $(function() {
 				count++;
 			});
 
-			if(data_type=='array') {
+			if(is_array) {
 				html += "\n" + indent + ']';
 			} else {
 				html += '}';
