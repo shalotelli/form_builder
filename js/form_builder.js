@@ -67,14 +67,13 @@ $(function() {
 		},
 
 		// clean value to be used in name
-		// TODO: Rmove non-alphanumeric characters
+		// TODO: Remove non-alphanumeric characters
 		cleanName: function(name) {
 			if(name===undefined || name.length===0) return '';
 
 			return name
 					.trim()
 					.replace(/ /g, '_')
-					// .replace(/[^A-Za-z0-9]/, '')
 					.toLowerCase();
 		},
 
@@ -87,34 +86,129 @@ $(function() {
 		},
 
 		updateSource: function() {
-			/*var content =	"<form method=\""+this.method+"\" " +
+			var content =	"<form method=\""+this.method+"\" " +
 							"action=\""+this.action+"\" " +
 							"class=\"form-horizontal\">\n" +
 							$("#content").html() +
-							"\n</form>";
+							"\n</form>",
+				transform = this.toTransform($("#content").children());
 
-			source.setValue(this.cleanContent(content));
+			// source.setValue(this.cleanContent(content));
 
-			source.autoFormatRange(
-				{ line: 0, ch: 0 },
-				{ line: source.lastLine()+1, ch: 0 }
-			);*/
+			$("#source").val(this.formatJSON(transform));
 		},
 
 		toTransform: function(obj) {
-			var json;
+			var json = [];
 
 			if(obj.length>1) {
-				json = [];
-
 				for(var i=0;i<obj.length;i++) {
-					json[json.length++] = this.objToTransform(obj[i]);
+					json.push(this.objToTransform(obj[i]));
 				}
 			} else {
 				json = this.objToTransform(obj);
 			}
 
 			return json;
+		},
+
+		objToTransform: function(obj) {
+			var el = $(obj).get(0),
+				json = { 'tag': el.nodeName.toLowerCase() },
+				attrs = el.attributes,
+				children = $(obj).children();
+
+			for(var i=0;i<attrs.length;i++) {
+				attr = attrs[i];
+				json[attr.nodeName] = attr.value;
+			}
+
+			if(children.length>0) {
+				json['children'] = [];
+			} else {
+				json['html'] = $(obj).text();
+			}
+
+			for(var c=0;c<children.length;c++) {
+				json['children'][json['children'].length++] = this.toTransform(children[c]);
+			}
+
+			return json;
+		},
+
+		formatJSON: function(data, indent) {
+			var indent_style = "  ",
+				data_type = $.type(data),
+				html = "",
+				count = 0;
+
+			indent = indent || '';
+
+			if(data_type=='array') {
+				if(data.length===0) {
+					return '[]';
+				}
+
+				html = '[';
+			} else {
+				$.each(data, function(key, val) {
+					count++;
+					return;
+				});
+
+				if(count===0) {
+					return '{}';
+				}
+
+				html = '{';
+			}
+
+			count = 0;
+
+			$.each(data, function(key, val) {
+				if(count>0) {
+					html += ',';
+				}
+
+				if(data_type=='array') {
+					html += "\n" + indent + indent_style;
+				} else {
+					html += '"' + key + '"' + ':';
+				}
+
+				switch($.type(val)) {
+					case 'array':
+					case 'object':
+						html += form_builder.formatJSON(val, (indent+indent_style));
+					break;
+
+					case 'boolean':
+					case 'number':
+						html += val.toString();
+					break;
+
+					case 'null':
+						html += 'null';
+					break;
+
+					case 'string':
+						html += '"' + val + '"';
+					break;
+
+					default:
+						html += 'TYPEOF: ' + typeof(val);
+				}
+
+				count++;
+			});
+
+			if(data_type=='array') {
+				html += "\n" + indent + ']';
+			} else {
+				html += '}';
+			}
+
+			return html;
 		},
 
 		addComponent: function(component) {
@@ -128,7 +222,7 @@ $(function() {
 
 			$("#options_modal").modal('hide');
 
-			// this.updateSource();
+			this.updateSource();
 		},
 
 		// form title options
@@ -673,20 +767,7 @@ $(function() {
 		$modal.modal('show');
 	});
 
-	// create codemirror instance & assign to global var source
-	/*source = CodeMirror.fromTextArea(document.getElementById("source"), {
-		lineNumbers: true,
-		tabMode: 'indent',
-		mode: { name: 'htmlmixed' }
-	});*/
-
-	// hack to sort random bug with codemirror & bootstrap tabs not playing nicely.
-	// adding a refresh after 1ms seems to sort out an issue where the source code
-	// box does not display until user starts typing something
 	$("a[href=#source-tab]").click(function() {
-		setTimeout(function() {
-			form_builder.updateSource();
-			// source.refresh();
-		}, 1);
+		form_builder.updateSource();
 	});
 });

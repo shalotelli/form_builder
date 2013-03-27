@@ -4,7 +4,6 @@
 
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-		<link href="css/codemirror.css" rel="stylesheet">
 
 		<link href="css/form_builder.css" rel="stylesheet">
 
@@ -12,14 +11,35 @@
 		<script src="js/jquery-ui.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 
+		<script src="js/json2html-0.4.1.js"></script>
+		<script src="js/jquery.json2html.js"></script>
+
 		<script src="js/form_builder.js"></script>
 
-		<script src="js/codemirror.js"></script>
-		<script src="js/mode/xml/xml.js"></script>
-		<script src="js/mode/javascript/javascript.js"></script>
-		<script src="js/mode/css/css.js"></script>
-		<script src="js/mode/htmlmixed/htmlmixed.js"></script>
-		<script src="js/format/formatting.js"></script>
+		<script>
+			$(function() {
+				$("#convert").on('click', function(e) {
+					var source = JSON.parse($("#source").val()),
+						source_type = $.type(source),
+						html = '';
+
+					if(source_type=='array') {
+						//
+					} else {
+						console.log(source);
+						html += '<'+source.tag+' ';
+
+						/*$.each(source.attr, function(key, val) {
+							html += key+'="'+val+'" ';
+						});*/
+
+						html += ">\n";
+
+						console.log(html);
+					}
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div class="row-fluid">
@@ -45,6 +65,10 @@
 
 								<div class="tab-pane" id="source-tab">
 									<textarea id="source"></textarea>
+									<br>
+									<button class="btn btn-primary" id="convert">Convert to HTML</button>
+									<br>
+									<div id="converted"></div>
 								</div>
 							</div>
 						</div>
