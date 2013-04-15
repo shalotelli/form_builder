@@ -188,7 +188,7 @@ $(function() {
 					textarea = el.find('textarea'),
 					label = el.find('label');
 
-				textarea.attr('name', options.cleanName($(this.prefix+'name').val()));
+				textarea.attr('name', form_builder.cleanName($(this.prefix+'name').val()));
 				label.text($(this.prefix+'label').val());
 				textarea.attr('placeholder', $(this.prefix+'placeholder').val());
 			}
