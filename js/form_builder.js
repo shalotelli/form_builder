@@ -1,45 +1,58 @@
-// New BSD License
-// ===============
-//
-// Copyright (c) 2013, Sha Alibhai
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// * Redistributions of source code must retain the above copyright notice,
-//   this list of conditions and the following disclaimer.
-// * Redistributions in binary form must reproduce the above copyright notice,
-//   this list of conditions and the following disclaimer in the documentation
-//   and/or other materials provided with the distribution.
-// * Neither the names of the copyright holders nor the names of its
-//   contributors may be used to endorse or promote products derived from this
-//   software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-//
-// --------------------------------------------------------------------------
-// USAGE
-// --------------------------------------------------------------------------
-// 1. Either click component or drag it in to the form
-// 2. 'Component' becomes 'Element'
-// 3. When element is clicked
-//      a. Load options into modal box
-//      b. Set type to element type (text|textarea|checkbox...)
-//      c. Call form_builder.type.get() to load in any pre processing
-//      d. Wait for input.......
-// 4. When options are saved
-//      a. Call form_builder.type.set() to save options
+/**
+    New BSD License
+    ===============
+
+    Copyright (c) 2013, Sha Alibhai
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    --------------------------------------------------------------------------
+    USAGE
+    --------------------------------------------------------------------------
+    1. Either click component or drag it in to the form
+    2. 'Component' becomes 'Element'
+    3. When element is clicked
+         a. Load options into modal box
+         b. Set type to element type (text|textarea|checkbox...)
+         c. Call form_builder.type.get() to load in any pre processing
+         d. Wait for input.......
+    4. When options are saved
+         a. Call form_builder.type.set() to save options
+         
+    @TODO Fix radio options
+    @TODO Fix checkbox options
+    @TODO Fix textarea options
+    @TODO Fix static text options
+    @TODO Add jQuery map
+    @TODO catch failures when loading options
+    @TODO fix UI misalignment when adding component to form (caused by close button)
+    @TODO input box type (password, date, email etc)
+    @TODO Remove & add cancel button instead of just making it invisible
+    @TODO Use minified version
+*/
 
 $(function() {
     // element options object
@@ -77,6 +90,7 @@ $(function() {
                     .toLowerCase();
         },
 
+        // sanitize HTML content
         cleanContent: function(content) {
             return content
                     .replace(/\t/, '')
@@ -85,6 +99,7 @@ $(function() {
                     .replace(/ data-(.+)="(.+)"/g, '');
         },
 
+        // update source code
         updateSource: function() {
             var content =   "<form method=\"" + this.method + "\" " +
                             "action=\"" + this.action + "\" " +
@@ -100,6 +115,7 @@ $(function() {
             );
         },
 
+        // add component to form
         addComponent: function(component) {
             component
             .clone()
@@ -112,6 +128,41 @@ $(function() {
             $("#options_modal").modal('hide');
 
             this.updateSource();
+        },
+
+        // load element options
+        loadOptions: function(type) {
+            var $el = $(this),
+                $modal = $("#options_modal"),
+                content = $modal.find('.modal-body');
+
+            // fail if no type set
+            if (! type) {
+                return false;
+            }
+
+            $.get('options/' + type + '.html', function(data) {
+                // set options modal type
+                $modal.data('type', type);
+
+                // load relevant options
+                content.html(data);
+
+                // set selected element to clicked element
+                // this removes the need to generate unique
+                // id's for every created element at they are
+                // passed instead of referenced
+                form_builder.setElement($el);
+
+                // add current options into fields and do any
+                // necessary preprocessing
+                form_builder[type].get();
+
+                // show options modal
+                $modal.modal('show');
+            });
+
+            return true;
         },
 
         // form title options
@@ -522,7 +573,6 @@ $(function() {
                 el.find('button[type=submit]').text($(this.prefix+'label').val());
 
                 // hide or show cancel button
-                // TODO: Remove & add cancel button instead of just making it invisible
                 if($(this.prefix+'show_cancel').val()==1) {
                     if(cancel.hasClass('hide')) {
                         cancel.removeClass('hide');
@@ -548,7 +598,7 @@ $(function() {
             return $(this).clone().addClass('component-drag');
         }
     })
-    .click(function(e) {
+    .on('click', function(e) {
         form_builder.addComponent($(this));
     });
 
@@ -565,35 +615,11 @@ $(function() {
     // clicking elements brings up customizable options in a
     // modal window
     $(document).on('click', '.element', function(e) {
-        var $that = $(this),
-            $modal = $("#options_modal"),
-            content = $modal.find('.modal-body'),
-            type = $that.data('type');
-
-        $.get('options/' + type + '.html', function(data) {
-            // set options modal type
-            $modal.data('type', type);
-
-            // load relevant options
-            content.html(data);
-
-            // set selected element to clicked element
-            // this removes the need to generate unique
-            // id's for every created element at they are
-            // passed instead of referenced
-            form_builder.setElement($that);
-
-            // add current options into fields and do any
-            // necessary preprocessing
-            form_builder[type].get();
-
-            // show options modal
-            $modal.modal('show');
-        });
+        form_builder.loadOptions.call(this, $(this).data('type'));
     });
 
     // options modal save button
-    $("#save_options").click(function() {
+    $("#save_options").on('click', function() {
         var $modal = $("#options_modal"),
             content = $modal.find('.modal-body'),
             type = $modal.data('type');
@@ -610,7 +636,7 @@ $(function() {
     });
 
     // random bug makes options modal load when certain components are clicked. prevent this!
-    $(".component > input, .component > textarea, .component > label, .checkbox, .radio").click(function(e) {
+    $(".component > input, .component > textarea, .component > label, .checkbox, .radio").on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
     });
@@ -628,7 +654,7 @@ $(function() {
     .sortable({
         placeholder: "element-placeholder",
         start: function(e, ui) {
-            ui.item.popover('hide');sdfsdfsdf
+            ui.item.popover('hide');
         }
     })
     .disableSelection();
@@ -636,26 +662,8 @@ $(function() {
     // the form can also be given a title by clicking the legend at the top
     // as this is not a component, do the necessary leg work and show the options
     // modal accordingly
-    $("#content_form_name").click(function() {
-        var $modal = $("#options_modal"),
-            content = $modal.find('.modal-body'),
-            type = 'title',
-            option_box = $(".options-title");
-
-        // set modal type to title
-        $modal.data('type', 'title');
-
-        // create options box
-        content.html(option_box.html());
-
-        // set form_builder element to this element
-        form_builder.setElement($(this));
-
-        // do any options pre processing
-        form_builder[type].get();
-
-        // show modal
-        $modal.modal('show');
+    $("#content_form_name").on('click', function(e) {
+        form_builder.loadOptions.call(this, 'title');
     });
 
     // create codemirror instance & assign to global var source
@@ -668,7 +676,7 @@ $(function() {
     // hack to sort random bug with codemirror & bootstrap tabs not playing nicely.
     // adding a refresh after 1ms seems to sort out an issue where the source code
     // box does not display until user starts typing something
-    $("a[href=#source-tab]").click(function() {
+    $("a[href=#source-tab]").on('click', function() {
         setTimeout(function() {
             form_builder.updateSource();
             source.refresh();
