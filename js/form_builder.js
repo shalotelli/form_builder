@@ -42,10 +42,6 @@
     4. When options are saved
          a. Call form_builder.type.set() to save options
          
-    @TODO Fix textarea options
-    @TODO Fix static text options
-    @TODO Add jQuery map
-    @TODO catch failures when loading options
     @TODO fix UI misalignment when adding component to form (caused by close button)
     @TODO input box type (password, date, email etc)
     @TODO Remove & add cancel button instead of just making it invisible
@@ -139,7 +135,11 @@ $(function() {
                 return false;
             }
 
-            $.get('options/' + type + '.html', function(data) {
+            return $.get('options/' + type + '.html', function(data) {
+                if (data === undefined) {
+                    return false;
+                }
+
                 // set options modal type
                 $modal.data('type', type);
 
@@ -158,9 +158,9 @@ $(function() {
 
                 // show options modal
                 $modal.modal('show');
-            });
 
-            return true;
+                return true;
+            });
         },
 
         // form title options
