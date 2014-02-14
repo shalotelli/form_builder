@@ -68,8 +68,3 @@ input[type=text] {
 	min-height: 50px;
 	opacity: 0.5;
 }
-
-/* OPTION BOXES */
-.options {
-	display: none;
-}

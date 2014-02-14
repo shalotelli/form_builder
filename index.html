@@ -1,387 +1,159 @@
 <html>
-	<head>
-		<title>Form Builder</title>
+    <head>
+        <title>Form Builder</title>
 
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-		<link href="css/codemirror.css" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="css/codemirror.css" rel="stylesheet">
 
-		<link href="css/form_builder.css" rel="stylesheet">
+        <link href="css/form_builder.css" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Options Modal -->
+        <div class="modal fade" id="options_modal" tabindex="-1" role="dialog" aria-labelledby="options_modal_label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="options_modal_label">Options</h4>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="save_options">Save changes</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<script src="js/jquery.min.js"></script>
-		<script src="js/jquery-ui.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
+        <div class="row">
+            <div class="col-lg-offset-1 col-sm-10 col-md-10">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <h1>Form Builder</h1>
+                        <hr>
+                        <div class="tabbable">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#editor-tab" data-toggle="tab">Editor</a></li>
+                                <li><a href="#source-tab" data-toggle="tab">Source</a></li>
+                            </ul>
 
-		<script src="js/form_builder.js"></script>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="editor-tab">
+                                    <form id="content" class="form-horizontal">
+                                        <fieldset id="content_form_name">
+                                            <legend>Form Name</legend>
+                                        </fieldset>
+                                    </form>
+                                </div>
 
-		<script src="js/codemirror.js"></script>
-		<script src="js/mode/xml/xml.js"></script>
-		<script src="js/mode/javascript/javascript.js"></script>
-		<script src="js/mode/css/css.js"></script>
-		<script src="js/mode/htmlmixed/htmlmixed.js"></script>
-		<script src="js/format/formatting.js"></script>
-	</head>
-	<body>
-		<div class="row-fluid">
-			<div class="span10 offset1">
-				<div class="row-fluid">
-					<div class="span6">
-						<h1>Form Builder</h1>
-						<hr>
-						<div class="tabbable">
-							<ul class="nav nav-tabs">
-								<li class="active"><a href="#editor-tab" data-toggle="tab">Editor</a></li>
-								<li><a href="#source-tab" data-toggle="tab">Source</a></li>
-							</ul>
+                                <div class="tab-pane" id="source-tab">
+                                    <textarea id="source"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-							<div class="tab-content">
-								<div class="tab-pane active" id="editor-tab">
-									<form id="content" class="form-horizontal">
-										<fieldset id="content_form_name">
-											<legend>Form Name</legend>
-										</fieldset>
-									</form>
-								</div>
+                    <div class="col-sm-6 col-md-6">
+                        <h1>Components</h1>
+                        <hr>
+                        <div id="components-container" class="form-horizontal">
+                            <div class="component form-group" data-type="text">
+                                <label class="control-label col-sm-4" for="text_input">Text Input</label>
+                                <div class="controls col-sm-8">
+                                    <input type="text" name="" id="text_input" placeholder="placeholder" class="form-control">
+                                </div>
+                            </div>
 
-								<div class="tab-pane" id="source-tab">
-									<textarea id="source"></textarea>
-								</div>
-							</div>
-						</div>
-					</div>
+                            <div class="component form-group" data-type="textarea">
+                                <label class="control-label col-sm-4" for="textarea">Textarea</label>
+                                <div class="controls col-sm-8">
+                                    <textarea name="" class="form-control" id="textarea" placeholder="placeholder"></textarea>
+                                </div>
+                            </div>
 
-					<div class="span6">
-						<h1>Components</h1>
-						<hr>
-						<div id="components-container" class="form-horizontal">
-							<div class="control-group component" data-type="text">
-								<label class="control-label" for="text_input">Text Input</label>
-								<div class="controls">
-									<input type="text" name="" id="text_input" placeholder="placeholder">
-								</div>
-							</div>
+                            <div class="component form-group" data-type="select_basic">
+                                <label class="control-label col-sm-4" for="select_basic">Select - Basic</label>
+                                <div class="controls col-sm-8">
+                                    <select class="form-control" name="" id="select_basic">
+                                        <option value="1">Option 1</option>
+                                        <option value="2">Option 2</option>
+                                        <option value="3">Option 3</option>
+                                    </select>
+                                </div>
+                            </div>
 
-							<div class="control-group component" data-type="textarea">
-								<label class="control-label" for="textarea">Textarea</label>
-								<div class="controls">
-									<textarea name="" id="textarea" placeholder="placeholder"></textarea>
-								</div>
-							</div>
+                            <div class="component form-group" data-type="select_multiple">
+                                <label class="control-label col-sm-4" for="select_multiple">Select - Multiple</label>
+                                <div class="controls col-sm-8">
+                                    <select name="" class="form-control" id="select_multiple" multiple="multiple" size="3">
+                                        <option value="1">Option 1</option>
+                                        <option value="2">Option 2</option>
+                                        <option value="3">Option 3</option>
+                                    </select>
+                                </div>
+                            </div>
 
-							<div class="control-group component" data-type="select_basic">
-								<label class="control-label" for="select_basic">Select - Basic</label>
-								<div class="controls">
-									<select name="" id="select_basic">
-										<option value="1">Option 1</option>
-										<option value="2">Option 2</option>
-										<option value="3">Option 3</option>
-									</select>
-								</div>
-							</div>
+                            <div class="component form-group" data-type="checkbox">
+                                <label class="control-label col-sm-4">Checkboxes</label>
+                                <div class="controls col-sm-8">
+                                    <div class="checkbox"><label class="" for="checkbox_1">
+                                        <input type="checkbox" name="checkbox" id="checkbox_1">
+                                        Option 1
+                                    </label></div>
+                                    <div class="checkbox"><label class="" for="checkbox_2">
+                                        <input type="checkbox" name="checkbox" id="checkbox_2">
+                                        Option 2
+                                    </label></div>
+                                    <div class="checkbox"><label class="" for="checkbox_3">
+                                        <input type="checkbox" name="checkbox" id="checkbox_3">
+                                        Option 3
+                                    </label></div>
+                                </div>
+                            </div>
 
-							<div class="control-group component" data-type="select_multiple">
-								<label class="control-label" for="select_multiple">Select - Multiple</label>
-								<div class="controls">
-									<select name="" id="select_multiple" multiple="multiple" size="3">
-										<option value="1">Option 1</option>
-										<option value="2">Option 2</option>
-										<option value="3">Option 3</option>
-									</select>
-								</div>
-							</div>
+                            <div class="component form-group" data-type="radio">
+                                <label class="control-label col-sm-4">Radio Buttons</label>
+                                <div class="controls col-sm-8">
+                                    <div class="radio"><label class="" for="radio_1">
+                                        <input type="radio" name="radio" id="radio_1">
+                                        Option 1
+                                    </label></div>
+                                    <div class="radio"><label class="" for="radio_2">
+                                        <input type="radio" name="radio" id="radio_2">
+                                        Option 2
+                                    </label></div>
+                                    <div class="radio"><label class="" for="radio_3">
+                                        <input type="radio" name="radio" id="radio_3">
+                                        Option 3
+                                    </label></div>
+                                </div>
+                            </div>
 
-							<div class="control-group component" data-type="checkbox">
-								<label class="control-label">Checkboxes</label>
-								<div class="controls">
-									<label class="checkbox" for="checkbox_1">
-										<input type="checkbox" name="checkbox" id="checkbox_1">
-										Option 1
-									</label>
-									<label class="checkbox" for="checkbox_2">
-										<input type="checkbox" name="checkbox" id="checkbox_2">
-										Option 2
-									</label>
-									<label class="checkbox" for="checkbox_3">
-										<input type="checkbox" name="checkbox" id="checkbox_3">
-										Option 3
-									</label>
-								</div>
-							</div>
+                            <div class="component form-group" data-type="static_text">
+                                <label class="control-label col-sm-4">Static Text</label>
+                                <div class="controls col-sm-8">
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                </div>
+                            </div>
 
-							<div class="control-group component" data-type="radio">
-								<label class="control-label">Radio Buttons</label>
-								<div class="controls">
-									<label class="radio" for="radio_1">
-										<input type="radio" name="radio" id="radio_1">
-										Option 1
-									</label>
-									<label class="radio" for="radio_2">
-										<input type="radio" name="radio" id="radio_2">
-										Option 2
-									</label>
-									<label class="radio" for="radio_3">
-										<input type="radio" name="radio" id="radio_3">
-										Option 3
-									</label>
-								</div>
-							</div>
+                            <div class="form-actions component" data-type="submit">
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                <button type="button" class="btn btn-default" onclick="javascript:window.history.back();">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-							<div class="control-group component" data-type="static_text">
-								<label class="control-label">Static Text</label>
-								<div class="controls">
-									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-								</div>
-							</div>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery-ui.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
 
-							<div class="form-actions component" data-type="submit">
-								<button type="submit" class="btn btn-primary">Save changes</button>
-								<button type="button" class="btn" onclick="javascript:window.history.back();">Cancel</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+        <script src="js/form_builder.min.js"></script>
 
-		<div class="modal fade" id="options_modal">
-			<div class="modal-header">
-				<a class="close" data-dismiss="modal">&times;</a>
-				<h3>Options</h3>
-			</div>
-
-			<div class="modal-body form-horizontal"></div>
-
-			<div class="modal-footer">
-				<a href="javascript:;" class="btn btn-primary" id="save_options">Save changes</a>
-				<a href="javascript:;" class="btn" data-dismiss="modal">Close</a>
-			</div>
-		</div>
-
-		<!-- Title Options -->
-		<div class="options options-title form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Form Name</label>
-				<div class="controls">
-					<input type="text" class="options_title_name" placeholder="Form Name">
-				</div>
-			</div>
-		</div>
-
-		<!-- Text Options -->
-		<div class="options options-text form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_text_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_text_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Placeholder</label>
-				<div class="controls">
-					<input type="text" class="options_text_placeholder" placeholder="Placeholder">
-				</div>
-			</div>
-		</div>
-
-		<!-- Textarea Options -->
-		<div class="options options-textarea form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_textarea_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_textarea_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Placeholder</label>
-				<div class="controls">
-					<input type="text" class="options_textarea_placeholder" placeholder="Placeholder">
-				</div>
-			</div>
-		</div>
-
-		<!-- Select - Basic Options -->
-		<div class="options options-select_basic form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_select_basic_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_select_basic_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Options</label>
-				<div class="controls">
-					<textarea class="options_select_basic_options" placeholder="Options"></textarea>
-					<span class="help-block">
-						Enter each option on a new line. If you want the value to be different to the displayed 
-						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Select - Multiple Options -->
-		<div class="options options-select_multiple form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_select_multiple_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_select_multiple_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Options</label>
-				<div class="controls">
-					<textarea class="options_select_multiple_options" placeholder="Options"></textarea>
-					<span class="help-block">
-						Enter each option on a new line. If you want the value to be different to the displayed 
-						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Checkbox Options -->
-		<div class="options options-checkbox form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_checkbox_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_checkbox_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Options</label>
-				<div class="controls">
-					<textarea class="options_checkbox_options" placeholder="Options"></textarea>
-					<span class="help-block">
-						Enter each option on a new line. If you want the value to be different to the displayed 
-						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Radio Options -->
-		<div class="options options-radio form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" class="options_radio_name" placeholder="Name">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_radio_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Options</label>
-				<div class="controls">
-					<textarea class="options_radio_options" placeholder="Options"></textarea>
-					<span class="help-block">
-						Enter each option on a new line. If you want the value to be different to the displayed 
-						text, enter the value followed by '=' and the option text. Eg: value_1=Option 1.
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Static Text Options -->
-		<div class="options options-static_text form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_static_text_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Text</label>
-				<div class="controls">
-					<textarea class="options_static_text_text" style="width:100%;" rows="15" placeholder="Text"></textarea>
-					<span class="help-block">
-						Enter text or valid HTML markup.
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Submit Options -->
-		<div class="options options-submit form-horizontal">
-			<div class="control-group">
-				<label class="control-label">Label</label>
-				<div class="controls">
-					<input type="text" class="options_submit_label" placeholder="Label">
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Show Cancel Button</label>
-				<div class="controls">
-					<select class="options_submit_show_cancel">
-						<option value="1" selected="selected">Yes</option>
-						<option value="0">No</option>
-					</select>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Form Method</label>
-				<div class="controls">
-					<select class="options_submit_method">
-						<option value="POST" selected="selected">POST</option>
-						<option value="GET">GET</option>
-					</select>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Form Action</label>
-				<div class="controls">
-					<input type="text" class="options_submit_action" placeholder="Name">
-				</div>
-			</div>
-		</div>
-	</body>
+        <script src="js/codemirror.min.js"></script>
+        <script src="js/formatting.js"></script>
+    </body>
 </html>
