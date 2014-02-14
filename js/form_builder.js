@@ -42,7 +42,6 @@
     4. When options are saved
          a. Call form_builder.type.set() to save options
          
-    @TODO Fix radio options
     @TODO Fix checkbox options
     @TODO Fix textarea options
     @TODO Fix static text options
@@ -500,19 +499,19 @@ $(function() {
                         if (val.indexOf(split) !== -1) {
                             var opt = val.split(split);
 
-                            list_options += "<label class=\"radio\" for=\"" + id + "\">\n" +
+                            list_options += "<div class=\"radio\"><label for=\"" + id + "\">\n" +
                                             "<input type=\"radio\" name=\"" + name + "\" " +
                                             "id=\"" + id + "\" " +
                                             "value=\"" + opt[0] + "\">\n" +
                                             opt[1] + "\n" +
-                                            "</label>\n";
+                                            "</label></div>\n";
                         } else {
-                            list_options += "<label class=\"radio\" for=\"" + id + "\">\n" +
+                            list_options += "<div class=\"radio\"><label for=\"" + id + "\">\n" +
                                             "<input type=\"radio\" name=\"" + name + "\" " +
                                             "id=\"" + id + "\" " +
                                             "value=\"" + form_builder.cleanName(val) + "\">\n" +
                                             val + "\n" +
-                                            "</label>\n";
+                                            "</label></div>\n";
                         }
                     }
                 });
